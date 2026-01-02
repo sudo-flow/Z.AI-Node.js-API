@@ -1,0 +1,30 @@
+{
+  "name": "zai-cli",
+  "version": "1.0.0",
+  "description": "CLI interface for Z.AI Chat",
+  "main": "index.js",
+  "bin": {
+    "zai-chat": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "pkg index.js --out-path ./dist"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "chalk": "^4.1.2",
+    "commander": "^9.4.1",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "keywords": [
+    "zai",
+    "cli",
+    "chat",
+    "glm"
+  ],
+  "author": "Development Team",
+  "license": "MIT"
+}
