@@ -1,4 +1,4 @@
-// Z.AI API Types based on the specification
+// OpenAI-Compatible API Types
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
@@ -140,15 +140,38 @@ export interface ModelsResponse {
   data: ModelInfo[];
 }
 
-// Available models from the specification
+// Available models from all providers
 export const AVAILABLE_MODELS = {
+  // Z.AI GLM Models
+  GLM_4_7: 'glm-4.7',
+  GLM_4_7_FLASH: 'glm-4.7-flash',
   GLM_4_6: 'glm-4.6',
   GLM_4_5: 'glm-4.5',
   GLM_4_5_AIR: 'glm-4.5-air',
   GLM_4_5_X: 'glm-4.5-x',
   GLM_4_5_AIRX: 'glm-4.5-airx',
   GLM_4_5_FLASH: 'glm-4.5-flash',
-  GLM_4_32B: 'glm-4-32b-0414-128k'
+  GLM_4_32B: 'glm-4-32b-0414-128k',
+  // OpenRouter Models
+  OPENROUTER_NOVA_MICRO: 'amazon/nova-micro-v1',
+  OPENROUTER_QWEN_3_5_FLASH: 'qwen/qwen3.5-flash-02-23'
 } as const;
 
 export type AvailableModel = typeof AVAILABLE_MODELS[keyof typeof AVAILABLE_MODELS];
+
+// Model provider mapping
+export const MODEL_PROVIDERS: Record<string, string> = {
+  // Z.AI Models
+  'glm-4.7': 'Z.AI',
+  'glm-4.7-flash': 'Z.AI',
+  'glm-4.6': 'Z.AI',
+  'glm-4.5': 'Z.AI',
+  'glm-4.5-air': 'Z.AI',
+  'glm-4.5-x': 'Z.AI',
+  'glm-4.5-airx': 'Z.AI',
+  'glm-4.5-flash': 'Z.AI',
+  'glm-4-32b-0414-128k': 'Z.AI',
+  // OpenRouter Models
+  'amazon/nova-micro-v1': 'OpenRouter (Amazon)',
+  'qwen/qwen3.5-flash-02-23': 'OpenRouter (Qwen)'
+};

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { AVAILABLE_MODELS } from '../types/zai';
+import { AVAILABLE_MODELS } from '../types/openai';
 
 // Chat Completion Request Validation Schema
 const chatCompletionSchema = Joi.object({
@@ -132,6 +132,8 @@ const chatCompletionSchema = Joi.object({
 
   // Validate temperature defaults based on model
   const modelTempDefaults: Record<string, number> = {
+    'glm-4.7': 1.0,
+    'glm-4.7-flash': 1.0,
     'glm-4.6': 1.0,
     'glm-4.5': 0.6,
     'glm-4.5-air': 0.6,
@@ -139,6 +141,9 @@ const chatCompletionSchema = Joi.object({
     'glm-4.5-airx': 0.6,
     'glm-4.5-flash': 0.6,
     'glm-4-32b-0414-128k': 0.75,
+    // OpenRouter models
+    'amazon/nova-micro-v1': 0.7,
+    'qwen/qwen3.5-flash-02-23': 0.7
   };
 
   if (!value.temperature && modelTempDefaults[value.model]) {

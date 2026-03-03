@@ -7,7 +7,7 @@ import {
   ChatCompletionStreamChunk,
   ErrorResponse,
   ModelsResponse,
-} from '../types/zai';
+} from '../types/openai';
 
 export class ZaiAPIClient {
   private axiosInstance: AxiosInstance;

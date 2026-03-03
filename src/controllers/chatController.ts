@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { zaiClient } from '../client/zaiClient';
-import { ChatCompletionRequest } from '../types/zai';
+import { ChatCompletionRequest } from '../types/openai';
 import { logger } from '../middleware/errorHandler';
-import { AVAILABLE_MODELS } from '../types/zai';
+import { AVAILABLE_MODELS } from '../types/openai';
 
 export class ChatController {
   async createChatCompletion(req: Request, res: Response) {

@@ -10,16 +10,27 @@ const envSchema = Joi.object({
 
   PORT: Joi.number().default(3000),
 
-  // Z.AI API Configuration
-  ZAI_API_KEY: Joi.string().required(),
-  ZAI_BASE_URL: Joi.string()
+  // Default Provider API Configuration (OpenAI-compatible)
+  DEFAULT_PROVIDER_API_KEY: Joi.string().required(),
+  DEFAULT_PROVIDER_BASE_URL: Joi.string()
     .uri()
     .default('https://api.z.ai/api/coding/paas/v4/'),
-  ZAI_TIMEOUT: Joi.number().default(300000), // 5 minutes
+  DEFAULT_PROVIDER_TIMEOUT: Joi.number().default(300000),
+
+  // OpenRouter API Configuration
+  OPENROUTER_API_KEY: Joi.string().optional().allow(''),
+  OPENROUTER_BASE_URL: Joi.string()
+    .uri()
+    .default('https://openrouter.ai/api/v1'),
+
+  // Legacy Z.AI Configuration (for backward compatibility)
+  ZAI_API_KEY: Joi.string().optional(),
+  ZAI_BASE_URL: Joi.string().optional(),
+  ZAI_TIMEOUT: Joi.number().optional(),
 
   // Service Configuration
   CORS_ORIGINS: Joi.string().default('*'),
-  RATE_LIMIT_WINDOW_MS: Joi.number().default(900000), // 15 minutes
+  RATE_LIMIT_WINDOW_MS: Joi.number().default(900000),
   RATE_LIMIT_MAX_REQUESTS: Joi.number().default(100),
 
   // Logging
@@ -28,7 +39,7 @@ const envSchema = Joi.object({
     .default('info'),
   LOG_PRETTY_PRINT: Joi.boolean().default(false),
 
-  // Redis (for rate limiting and caching)
+  // Redis
   REDIS_URL: Joi.string().uri().optional(),
   REDIS_HOST: Joi.string().default('localhost'),
   REDIS_PORT: Joi.number().default(6379),
@@ -36,7 +47,7 @@ const envSchema = Joi.object({
 
   // Monitoring
   METRICS_ENABLED: Joi.boolean().default(true),
-  HEALTH_CHECK_INTERVAL: Joi.number().default(30000), // 30 seconds
+  HEALTH_CHECK_INTERVAL: Joi.number().default(30000),
 }).unknown();
 
 const { error, value: envVars } = envSchema.validate(process.env);
@@ -49,10 +60,24 @@ export const config = {
   environment: envVars.NODE_ENV,
   port: envVars.PORT,
 
+  // Default provider config (primary AI provider)
+  defaultProvider: {
+    apiKey: envVars.DEFAULT_PROVIDER_API_KEY || envVars.ZAI_API_KEY,
+    baseUrl: envVars.DEFAULT_PROVIDER_BASE_URL.replace(/\/$/, '') || envVars.ZAI_BASE_URL?.replace(/\/$/, '') || 'https://api.z.ai/api/coding/paas/v4',
+    timeout: envVars.DEFAULT_PROVIDER_TIMEOUT || envVars.ZAI_TIMEOUT || 300000,
+  },
+
+  // OpenRouter config
+  openrouter: {
+    apiKey: envVars.OPENROUTER_API_KEY,
+    baseUrl: envVars.OPENROUTER_BASE_URL.replace(/\/$/, ''),
+  },
+
+  // Legacy zai config (for backward compatibility)
   zai: {
-    apiKey: envVars.ZAI_API_KEY,
-    baseUrl: envVars.ZAI_BASE_URL.replace(/\/$/, ''), // Remove trailing slash
-    timeout: envVars.ZAI_TIMEOUT,
+    apiKey: envVars.ZAI_API_KEY || envVars.DEFAULT_PROVIDER_API_KEY,
+    baseUrl: envVars.ZAI_BASE_URL?.replace(/\/$/, '') || envVars.DEFAULT_PROVIDER_BASE_URL.replace(/\/$/, '') || 'https://api.z.ai/api/coding/paas/v4',
+    timeout: envVars.ZAI_TIMEOUT || envVars.DEFAULT_PROVIDER_TIMEOUT || 300000,
   },
 
   cors: {

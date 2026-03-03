@@ -1,0 +1,279 @@
+# Configuration for the OpenAI-Compatible Endpoint Microservice
+#
+# Guidelines:
+# - Copy this file to `config.yaml` and customize it for your environment
+# - The default path of this file is `config.yaml` in the current working directory
+# - Environment variables are available for all field values. Example: `api_key: $DEFAULT_PROVIDER_API_KEY`
+
+# ============================================================================
+# Server Configuration
+# ============================================================================
+
+server:
+  port: 3000
+  environment: development
+  host: 0.0.0.0
+  timeout: 300000
+  max_body_size: 10mb
+
+# ============================================================================
+# Default Provider Configuration
+# ============================================================================
+# Primary AI provider (e.g., Z.AI for GLM models)
+
+default_provider:
+  api_key: $DEFAULT_PROVIDER_API_KEY
+  base_url: https://api.z.ai/api/coding/paas/v4/
+  timeout: 300000
+  max_retries: 3
+  retry_delay: 1000
+
+# ============================================================================
+# OpenRouter API Configuration
+# ============================================================================
+# For accessing additional models from multiple providers
+
+openrouter_api:
+  api_key: $OPENROUTER_API_KEY
+  base_url: https://openrouter.ai/api/v1
+  timeout: 300000
+  max_retries: 3
+  retry_delay: 1000
+  site_url: http://localhost:3000
+  app_name: OpenAI Endpoint Microservice
+
+# ============================================================================
+# Models Configuration
+# ============================================================================
+
+models:
+  # Z.AI GLM Models
+  - name: glm-4.7
+    display_name: GLM-4.7
+    enabled: true
+    provider: Z.AI
+    context_length: 200000
+    max_output_tokens: 128000
+    default_temperature: 1.0
+    supports_thinking: true
+    supports_vision: false
+    supports_function_calling: true
+    supports_streaming: true
+
+  - name: glm-4.7-flash
+    display_name: GLM-4.7 Flash
+    enabled: true
+    provider: Z.AI
+    context_length: 200000
+    max_output_tokens: 128000
+    default_temperature: 1.0
+    supports_thinking: true
+    supports_vision: false
+    supports_function_calling: true
+    supports_streaming: true
+
+  - name: glm-4.6
+    display_name: GLM-4.6
+    enabled: true
+    provider: Z.AI
+    context_length: 128000
+    max_output_tokens: 128000
+    default_temperature: 1.0
+    supports_thinking: true
+    supports_vision: false
+    supports_function_calling: true
+    supports_streaming: true
+
+  - name: glm-4.5
+    display_name: GLM-4.5
+    enabled: true
+    provider: Z.AI
+    context_length: 128000
+    max_output_tokens: 128000
+    default_temperature: 0.6
+    supports_thinking: false
+    supports_vision: false
+    supports_function_calling: true
+    supports_streaming: true
+
+  - name: glm-4.5-flash
+    display_name: GLM-4.5 Flash
+    enabled: true
+    provider: Z.AI
+    context_length: 128000
+    max_output_tokens: 128000
+    default_temperature: 0.6
+    supports_thinking: false
+    supports_vision: false
+    supports_function_calling: true
+    supports_streaming: true
+
+  # OpenRouter Models
+  - name: amazon/nova-micro-v1
+    display_name: Amazon Nova Micro v1
+    enabled: true
+    provider: OpenRouter
+    context_length: 128000
+    max_output_tokens: 128000
+    default_temperature: 0.7
+    supports_thinking: false
+    supports_vision: true
+    supports_function_calling: true
+    supports_streaming: true
+
+  - name: qwen/qwen3.5-flash-02-23
+    display_name: Qwen 3.5 Flash
+    enabled: true
+    provider: OpenRouter
+    context_length: 256000
+    max_output_tokens: 65536
+    default_temperature: 0.7
+    supports_thinking: false
+    supports_vision: true
+    supports_function_calling: true
+    supports_streaming: true
+
+# ============================================================================
+# Security Configuration
+# ============================================================================
+
+security:
+  authentication:
+    method: bearer_token
+    header_name: Authorization
+    header_prefix: Bearer
+
+  cors:
+    origins: "*"
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    allowed_headers:
+      - Origin
+      - X-Requested-With
+      - Content-Type
+      - Accept
+      - Authorization
+      - X-Request-ID
+    credentials: true
+    max_age: 86400
+
+  rate_limiting:
+    enabled: true
+    window_ms: 900000
+    max_requests: 100
+    skip_paths:
+      - /health
+      - /ready
+      - /alive
+    use_api_key: true
+
+# ============================================================================
+# Logging Configuration
+# ============================================================================
+
+logging:
+  level: info
+  pretty_print: true
+  format: pretty
+  timestamps: true
+
+  requests:
+    enabled: true
+    include_body: false
+    include_headers: true
+
+  responses:
+    enabled: true
+    include_body: false
+    status_codes:
+      - 400
+      - 401
+      - 403
+      - 404
+      - 500
+      - 502
+      - 503
+
+# ============================================================================
+# Monitoring Configuration
+# ============================================================================
+
+monitoring:
+  metrics_enabled: true
+
+  health_checks:
+    interval: 30000
+    timeout: 10000
+    retries: 3
+
+  request_id:
+    enabled: true
+    header_name: X-Request-ID
+    generate_if_missing: true
+
+  performance:
+    track_response_times: true
+    track_memory_usage: true
+    track_active_connections: true
+
+# ============================================================================
+# Redis Configuration (Optional)
+# ============================================================================
+
+# redis:
+#   enabled: true
+#   url: redis://localhost:6379
+#   host: localhost
+#   port: 6379
+#   password: $REDIS_PASSWORD
+#   database: 0
+#   max_connections: 10
+#   key_prefix: openai-endpoint:
+
+# ============================================================================
+# Environment-Specific Overrides
+# ============================================================================
+
+development:
+  server:
+    port: 3000
+    environment: development
+  logging:
+    level: debug
+    pretty_print: true
+  security:
+    rate_limiting:
+      enabled: false
+
+production:
+  server:
+    port: 3000
+    environment: production
+  logging:
+    level: info
+    pretty_print: false
+    format: json
+  security:
+    cors:
+      origins:
+        - https://your-domain.com
+        - https://api.your-domain.com
+    rate_limiting:
+      enabled: true
+      max_requests: 1000
+
+test:
+  server:
+    port: 3001
+    environment: test
+  logging:
+    level: silent
+  security:
+    rate_limiting:
+      enabled: false
+  monitoring:
+    metrics_enabled: false
